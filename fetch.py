@@ -24,6 +24,12 @@ def safe_internet_fetch(func):
         BabyFetchException: if it fails to fetch the html codes from the url.
     """
     # TODO: Implement this decorator
+    def inner(**kwargs):
+        try:
+            return func(**kwargs)
+        except urllib.error.URLError:
+            raise BabyFetchException("Request Failed")
+    return inner
 
 
 @safe_internet_fetch
@@ -45,6 +51,10 @@ def fetch_top_1000(url, year):
     # Hint: You can concatenate multiple data using '&' (e.g. data = "month=December&day=25")
     # You must use standard library `urllib` to send request. (i.e. 3rd party libraries are not allowed.)
     # Reference link for urllib: https://docs.python.org/3/library/urllib.request.html#urllib.request.urlopen
+    data = urllib.parse.urlencode({"year": year, "top": 1000, "token": "Submit"})
+    data = data.encode("utf-8")
+    request=urllib.request.Request(url, data=data, method="POST")
+    return urllib.request.urlopen(request).read().decode("utf-8")
 
 
 def main():
