@@ -45,6 +45,13 @@ def check_filename_existence(func):
         BabynameFileNotFoundException: if there is no such file matching the first two arguments of the function to decorate.
     """
     # TODO: Implement this decorator
+    def inner(*args):
+        try:
+            return func(*args)
+        except FileNotFoundError:
+            filename = f"{args[1]}/{args[2]}.html"
+            raise BabynameFileNotFoundException(f"No such file: {filename}")
+    return inner
 
 
 class BabynameParser:
@@ -63,7 +70,9 @@ class BabynameParser:
         """
         # TODO: Open and read html file of the corresponding year, and assign the content to `text`.
         # Also, make the BabynameParser to have the year attribute.
-        text = "TODO"
+        with open(f"{dirname}/{year}.html", 'r') as f:
+            text = f.read()
+        self.year = year
 
         # TODO: Implement the tuple extracting code.
         # `self.rank_to_names_tuples` should be a list of tuples of ("rank", "male name", "female name").
@@ -71,7 +80,11 @@ class BabynameParser:
         # (If you resolve the previous TODO, the html content is saved in `text`.)
         # You may find the following method useful: `re.findall`.
         # See https://docs.python.org/3/library/re.html#re.findall.
-        self.rank_to_names_tuples = [("1", "TODO_male", "TODO_female"), ("2", "TODO_male", "TODO_female")]
+        pattern = r"<td>\d*</td> <td>[a-zA-Z]*</td> <td>[a-zA-Z]*</td>"
+        raw_datas = re.findall(pattern, text)
+        parsed_datas = [data.split(" ") for data in raw_datas]
+        self.rank_to_names_tuples = [(rank.strip(r"</?td>"), male.strip(r"</?td>"), female.strip(r"</?td>")) for rank, male, female in parsed_datas]
+        
 
     def parse(self, parsing_lambda):
         """
@@ -86,3 +99,4 @@ class BabynameParser:
             A list of lambda function's output
         """
         # TODO: Implement this method
+        return list(map(parsing_lambda, self.rank_to_names_tuples))
