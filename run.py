@@ -46,6 +46,10 @@ class BabyRecord:
         e.g. 2018,1,Joan,F,-2
         """
         # TODO: Implment this function
+        output = f"{self.year}, {self.rank}, {self.name}, {self.gender}, "
+        if self.rank_change:
+            output += str(self.rank_change)
+        return output
 
 
     def __repr__(self):
@@ -98,14 +102,42 @@ def main():
         # TODO: In the following two lines, change `None` to your lambda function to parse baby name records.
         # By using the lambda function, `parse` method should return a list of `BabyRecord` objects
         # that contain year, rank, name, and gender data.
-        male_records = parser.parse(None) # Parse the male ranks and store them as a list of `BabyRecord` objects.
-        female_records = parser.parse(None) # Parse the female ranks and store it as a list of `BabyRecord` objects.
-
+        male_records = parser.parse(lambda x: BabyRecord(year=year, rank=int(x[0]), name=x[1], gender='M')) # Parse the male ranks and store them as a list of `BabyRecord` objects.
+        female_records = parser.parse(lambda x: BabyRecord(year=year, rank=int(x[0]), name=x[2], gender='F')) # Parse the female ranks and store it as a list of `BabyRecord` objects.
         # TODO: Calculate the rank change for each of `male_records` and `female_records`.
         # For example, if the rank of the previous year is 8 and the rank of the current year is 5,
         # -3 is the rank change. (Beware the sign of the value. Rank-up is respresented with a negative value!)
         # If the rank of previous year is not available, set `rank_change` to `None`.
+        for idx in range(1000):
+            babyrecord = male_records[idx]
+            male_name = babyrecord.name
+            male_rank = babyrecord.rank
+            prev_year = prev_male_ranking.get(year-1)
+            if prev_year:
+                prev_rank = prev_year.get(male_name)
+                babyrecord.rank_change = male_rank - prev_rank if prev_rank else None
+            if prev_male_ranking.get(year):
+                prev_male_ranking[year][male_name] = male_rank
+            else: 
+                prev_male_ranking[year] = {
+                    male_name: male_rank
+                }
+                
+            babyrecord = female_records[idx]
+            female_name = babyrecord.name
+            female_rank = babyrecord.rank
+            prev_year = prev_female_ranking.get(year-1)
+            if prev_year:
+                prev_rank = prev_year.get(female_name)
+                babyrecord.rank_change = female_rank - prev_rank if prev_rank else None
+            if prev_female_ranking.get(year):
+                prev_female_ranking[year][female_name] = female_rank
+            else: 
+                prev_female_ranking[year] = {
+                    female_name: female_rank
+                }
 
+        records.extend([*male_records, *female_records])
     # TODO: Save the result as a csv file named `babyname.report.csv` under `babydata/` directory.
     # The output example of `babyname.report.csv` is provided in `babydata/` folder.
     # Your generated csv file should be identical with the csv file example.
