@@ -24,9 +24,9 @@ def safe_internet_fetch(func):
         BabyFetchException: if it fails to fetch the html codes from the url.
     """
     # TODO: Implement this decorator
-    def inner(**kwargs):
+    def inner(*args):
         try:
-            return func(**kwargs)
+            return func(*args)
         except urllib.error.URLError:
             raise BabyFetchException("Request Failed")
     return inner
@@ -53,7 +53,7 @@ def fetch_top_1000(url, year):
     # Reference link for urllib: https://docs.python.org/3/library/urllib.request.html#urllib.request.urlopen
     data = urllib.parse.urlencode({"year": year, "top": 1000, "token": "Submit"})
     data = data.encode("utf-8")
-    request=urllib.request.Request(url, data=data, method="POST")
+    request = urllib.request.Request(url, data=data, method="POST")
     return urllib.request.urlopen(request).read().decode("utf-8")
 
 
@@ -64,7 +64,7 @@ def main():
     # The html files you generate should be identical with the provided html file examples.
     # You can check the difference with `diff` command.
     for year in range(2001, 2019):
-        pathname = os.path.join("babydata", "{}.html".format(year))
+        pathname = os.path.join("babydata", "{}-test.html".format(year))
         with open(pathname, "w") as f:
             url = "https://www.ssa.gov/cgi-bin/popularnames.cgi"  # target url to fetch baby data
             f.write(fetch_top_1000(url, year))

@@ -46,8 +46,8 @@ class BabyRecord:
         e.g. 2018,1,Joan,F,-2
         """
         # TODO: Implment this function
-        output = f"{self.year}, {self.rank}, {self.name}, {self.gender}, "
-        if self.rank_change:
+        output = f"{self.year},{self.rank},{self.name},{self.gender},"
+        if self.rank_change or self.rank_change==0:
             output += str(self.rank_change)
         return output
 

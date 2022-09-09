@@ -83,7 +83,7 @@ class BabynameParser:
         pattern = r"<td>\d*</td> <td>[a-zA-Z]*</td> <td>[a-zA-Z]*</td>"
         raw_datas = re.findall(pattern, text)
         parsed_datas = [data.split(" ") for data in raw_datas]
-        self.rank_to_names_tuples = [(rank.strip(r"</?td>"), male.strip(r"</?td>"), female.strip(r"</?td>")) for rank, male, female in parsed_datas]
+        self.rank_to_names_tuples = [(rank.strip(r"</?td>"), male[4:-5], female[4:-5]) for rank, male, female in parsed_datas]
         
 
     def parse(self, parsing_lambda):
